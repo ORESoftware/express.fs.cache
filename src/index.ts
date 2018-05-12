@@ -9,6 +9,7 @@ import {AsyncQueue} from "async";
 import * as fs from "fs";
 import * as path from "path";
 import parseUrl = require('parseurl');
+import EventEmitter = require('events');
 
 const log = {
   info: console.log.bind(console, chalk.gray.bold('@oresoftware/express.fs.cache:')),
@@ -29,10 +30,14 @@ export interface StatikCache {
   [index: string]: string;
 }
 
-export const statikCache = function (p: string | StatikCacheOpts, opts?: StatikCacheOpts) {
+export interface StatikCacheEmitter extends EventEmitter {
+  (p: string | StatikCacheOpts, opts?: StatikCacheOpts): RequestHandler
+}
+
+export const statikCache: StatikCacheEmitter = function (p, opts) {
   
   let basePath = '';
-  if (p && typeof p == 'object') {
+  if (p && typeof p === 'object') {
     opts = p as StatikCacheOpts;
     basePath = opts.base || ''
   }
@@ -41,6 +46,20 @@ export const statikCache = function (p: string | StatikCacheOpts, opts?: StatikC
   }
   
   opts = opts || {} as StatikCacheOpts;
+  
+  const debug = opts.debug || false;
+  let isSelfLog = false;
+  
+  if (debug) {
+    process.nextTick(function () {
+      if (statikCache.listenerCount('info') < 1) {
+        log.warn('to handle logging yourself, add an event listener for the event "info".');
+        isSelfLog = true;
+      }
+    });
+  }
+  
+  const eventName = 'express.fs.cache';
   const cache = {} as StatikCache;
   let stdout = '';
   
@@ -87,17 +106,21 @@ export const statikCache = function (p: string | StatikCacheOpts, opts?: StatikC
   q.drain = function () {
     const keys = Object.keys(cache);
     log.info('this many files are in the cache:', keys.length);
-    if (opts.debug) {
-      log.info('here are the files in the cache:');
+    if (debug) {
+      isSelfLog ?
+        log.info('here are the files in the cache:') :
+        statikCache.emit(eventName, 'this many files are in the cache:', keys.length);
+      
       keys.forEach(function (k) {
-        log.info(k);
+        isSelfLog ? log.info(k) : statikCache.emit(eventName, k);
       });
     }
+    
   };
   
   return <RequestHandler>function (req, res, next) {
     
-    const method = String(req.method).trim().toUpperCase();
+    const method = String(req.method || '').trim().toUpperCase();
     
     if (!methods[method]) {
       return next();
@@ -114,23 +137,29 @@ export const statikCache = function (p: string | StatikCacheOpts, opts?: StatikC
     absFilePath = path.resolve(basePath + '/' + absFilePath);
     
     if (cache[absFilePath]) {
-      log.info('using cache for file:', absFilePath);
-      res.end('\n\n' + cache[absFilePath] + '\n');
-      return;
+      
+      if (debug) {
+        isSelfLog ?
+          log.info('using cache for file:', absFilePath) :
+          statikCache.emit(eventName, 'using cache for file:', absFilePath);
+      }
+      
+      return res.end('\n\n' + cache[absFilePath] + '\n');
     }
     
-    log.warn('not using cache for file:', absFilePath);
+    if (debug) {
+      isSelfLog ?
+        log.warn('not using cache for file:', absFilePath) :
+        statikCache.emit(eventName, 'not using cache for file:', absFilePath);
+    }
+    
     next();
     
-    // try {
-    //   res.sendFile(absFilePath);
-    // }
-    // catch (err) {
-    //   next(err);
-    // }
-    //
   }
   
 };
 
+
+const p = Object.assign(Object.create(Function.prototype), EventEmitter.prototype);
+Object.setPrototypeOf(statikCache, p);
 export default statikCache;
