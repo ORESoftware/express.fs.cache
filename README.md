@@ -1,9 +1,9 @@
 
+### @oresoftware/express.fs.cache
 
-# @oresoftware/express.fs.cache
+### Use Express middleware to cache and serve static assets 
 
-## Use Express middleware to cache and serve static assets 
-
+#### Installation: `npm install @oresoftware/express.fs.cache`
 
 ```js
 
