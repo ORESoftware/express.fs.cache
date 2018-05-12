@@ -10,6 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import parseUrl = require('parseurl');
 import EventEmitter = require('events');
+import {makeFunctionEmitter, FunctionEmitter} from "./utils";
 
 const log = {
   info: console.log.bind(console, chalk.gray.bold('@oresoftware/express.fs.cache:')),
@@ -30,11 +31,11 @@ export interface StatikCache {
   [index: string]: string;
 }
 
-export interface StatikCacheEmitter extends EventEmitter {
+export interface StatikCacheEmitter extends FunctionEmitter {
   (p: string | StatikCacheOpts, opts?: StatikCacheOpts): RequestHandler
 }
 
-export const statikCache: StatikCacheEmitter = function (p, opts) {
+export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, opts) {
   
   let basePath = '';
   if (p && typeof p === 'object') {
@@ -97,7 +98,7 @@ export const statikCache: StatikCacheEmitter = function (p, opts) {
     .forEach(function (v) {
       q.push(function (cb: any) {
         fs.readFile(v, function (err, data) {
-          if (!err) cache[v] = String(data || '');
+          if (!err) (cache[v] = String(data || ''));
           cb(null);
         });
       });
@@ -107,8 +108,7 @@ export const statikCache: StatikCacheEmitter = function (p, opts) {
     const keys = Object.keys(cache);
     log.info('this many files are in the cache:', keys.length);
     if (debug) {
-      isSelfLog ?
-        log.info('here are the files in the cache:') :
+      isSelfLog ? log.info('here are the files in the cache:') :
         statikCache.emit(eventName, 'this many files are in the cache:', keys.length);
       
       keys.forEach(function (k) {
@@ -139,8 +139,7 @@ export const statikCache: StatikCacheEmitter = function (p, opts) {
     if (cache[absFilePath]) {
       
       if (debug) {
-        isSelfLog ?
-          log.info('using cache for file:', absFilePath) :
+        isSelfLog ? log.info('using cache for file:', absFilePath) :
           statikCache.emit(eventName, 'using cache for file:', absFilePath);
       }
       
@@ -157,9 +156,6 @@ export const statikCache: StatikCacheEmitter = function (p, opts) {
     
   }
   
-};
+});
 
-
-const p = Object.assign(Object.create(Function.prototype), EventEmitter.prototype);
-Object.setPrototypeOf(statikCache, p);
 export default statikCache;
