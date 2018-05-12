@@ -8,10 +8,10 @@
 ```js
 
 import express = require('express');
-import cacheAndServe from '@oresoftware/express.fs.cache';
+import fsCache from '@oresoftware/express.fs.cache';
 
 
-app.use('/public', cacheAndServe(path.join(__dirname, 'public')));
+app.use('/public', fsCache(path.join(__dirname, 'public')));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 
