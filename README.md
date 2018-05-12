@@ -1,47 +1,27 @@
 
 
-# Your Project Readme Goes Here
+# @oresoftware/express.fs.cache
 
-This project is used by:
-https://github.com/oresoftware/ts-project
-You can use ts-project to do things more automatically.
-
-To do things more manually, continue on.
-
-Steps to making this project skeleton your own project base.
-
-1. Clone this repo: <br>
-    `git clone https://github.com/ORESoftware/typescript-library-skeleton.git YOUR-PROJECT-NAME`
-2. Update package.json so that `name` property matches `YOUR-PROJECT-NAME`.
-3. Update other package.json fields so that they are accurate.
-
-To check to see if `YOUR-PROJECT-NAME` is available on NPM, uses this command at the command line:
-
-`$ npm view YOUR-PROJECT-NAME`  # will give you a 404 if the name is available.
+## Use Express middleware to cache and serve static assets 
 
 
-### This project skeleton uses:
+```js
 
-* the correct semver initial value (npm init defaults to 1.0.0 which is just wrong).
-* typescript 2.x
-* nodejs version 9
-* travis (for automated testing of your library)
-* MIT license
-* good simple default settings for .gitignore / .npmignore / .editorconfig / .gitattributes
-* Transpiling from src to dist folders (by default, you can change it manually)
+import express = require('express');
+import cacheAndServe from '@oresoftware/express.fs.cache';
 
 
-To transpile files in place, instead of tranpiling from `'src'` to `'dist'`:
+app.use('/public', cacheAndServe(path.join(__dirname, 'public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
-<br>
-update tsconfig.json  (remove the `outDir` line):
 
-```json
-"compilerOptions": {
-    "outDir": "dist"    
-}
 ```
 
-For small projects with just one .ts/.js file, you can just get rid of the src/lib folder, and put your index.ts
-file in the root of the project. In that case, make sure to change the `main` property in package.json from 'lib/index.js' to
-'index.js'. Same with the `typings/types` properties. 
+If the files are in the cache, they will get served by the cache.
+By default, we would cache all .js, .html, .css files in the public directory.
+The cached files would be served from an in-memory cache.
+
+If for some reason, a file is not in the cache, then the regular express static middleware would
+pick up where we left off. 
+
+This middleware never calls `next(err)`, only `next()`.

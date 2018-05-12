@@ -71,7 +71,7 @@ export const statikCache = function (p: string | StatikCacheOpts, opts?: StatikC
   
   String(stdout).split('\n').map(v => String(v || '').trim())
     .filter(function (v) {
-      if (v && matchesExtensions(String(v))) {
+      if (v && matchesExtensions(v)) {
         return true;
       }
     })
@@ -132,3 +132,5 @@ export const statikCache = function (p: string | StatikCacheOpts, opts?: StatikC
   }
   
 };
+
+export default statikCache;
