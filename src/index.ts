@@ -1,6 +1,6 @@
 'use strict';
 
-import {RequestHandler} from "express";
+import {Request, RequestHandler, Response} from "express";
 import cp = require('child_process');
 import chalk from "chalk";
 import {getCleanTrace} from "clean-trace";
@@ -11,6 +11,7 @@ import * as path from "path";
 import parseUrl = require('parseurl');
 import EventEmitter = require('events');
 import {makeFunctionEmitter, FunctionEmitter} from "./utils";
+import fresh = require('fresh');
 
 const log = {
   info: console.log.bind(console, chalk.gray.bold('@oresoftware/express.fs.cache:')),
@@ -91,19 +92,16 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
   };
   
   String(stdout).split('\n').map(v => String(v || '').trim())
-    .filter(function (v) {
-      if (v && matchesExtensions(v)) {
-        return true;
-      }
-    })
     .forEach(function (v) {
-      log.info('all those files:', v);
-      q.push(function (cb: any) {
-        fs.readFile(v, function (err, data) {
-          if (!err) (cache[v] = String(data || ''));
-          cb(null);
+      if (v && matchesExtensions(v)) {
+        log.info('all those files:', v);
+        q.push(function (cb: any) {
+          fs.readFile(v, function (err, data) {
+            if (!err) (cache[v] = String(data || ''));
+            cb(null);
+          });
         });
-      });
+      }
     });
   
   q.drain = function () {
@@ -117,7 +115,26 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
         isSelfLog ? log.info(k) : statikCache.emit(eventName, k);
       });
     }
+  };
+  
+  const isFresh = function (method: string, req: Request, res: Response) {
     
+    const status = res.statusCode;
+    
+    // GET or HEAD for weak freshness validation only
+    if ('GET' !== method && 'HEAD' !== method) {
+      return false;
+    }
+    
+    // 2xx or 304 as per rfc2616 14.26
+    if ((status >= 200 && status < 300) || 304 === status) {
+      return fresh(res.headers, {
+        'etag': res.get('ETag'),
+        'last-modified': res.get('Last-Modified')
+      })
+    }
+    
+    return false;
   };
   
   return <RequestHandler>function (req, res, next) {
@@ -126,6 +143,17 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
     
     if (!methods[method]) {
       return next();
+    }
+    
+    if (isFresh(method, req, res)) {
+      res.statusCode = 304;
+    }
+    
+    if (204 === res.statusCode || 304 === res.statusCode) {
+      res.removeHeader('Content-Type');
+      res.removeHeader('Content-Length');
+      res.removeHeader('Transfer-Encoding');
+      return res.end('');
     }
     
     const originalUrl = parseUrl.original(req);
