@@ -52,6 +52,7 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
   let isSelfLog = false;
   
   if (debug) {
+    log.warn('we are debugging.');
     process.nextTick(function () {
       if (statikCache.listenerCount('info') < 1) {
         log.warn('to handle logging yourself, add an event listener for the event "info".');
@@ -65,7 +66,7 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
   let stdout = '';
   
   try {
-    stdout = String(cp.execSync(` . "$HOME/.gmx/gmx.sh"; gmx waldo ${basePath};\n`) || '').trim();
+    stdout = String(cp.execSync(` . "$HOME/.gmx/gmx.sh"; gmx waldo -p ${basePath};\n`) || '').trim();
   }
   catch (err) {
     log.error('cannot read contents in directory:', p);
@@ -96,6 +97,7 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
       }
     })
     .forEach(function (v) {
+      log.info('all those files:', v);
       q.push(function (cb: any) {
         fs.readFile(v, function (err, data) {
           if (!err) (cache[v] = String(data || ''));
