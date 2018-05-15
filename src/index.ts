@@ -128,7 +128,7 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
     
     // 2xx or 304 as per rfc2616 14.26
     if ((status >= 200 && status < 300) || 304 === status) {
-      return fresh(res.headers, {
+      return fresh(req.headers, {
         'etag': res.get('ETag'),
         'last-modified': res.get('Last-Modified')
       })
