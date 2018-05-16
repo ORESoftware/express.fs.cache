@@ -2,6 +2,7 @@ FROM node:9
 
 RUN apt-get -y update
 RUN apt-get -y install sudo
+RUN apt-get -y install bash
 RUN sudo apt-get -y update
 RUN apt-get install -y netcat
 
@@ -12,6 +13,7 @@ USER newuser
 ENV HOME="/home/newuser"
 ENV USER=newuser
 RUN mkdir -p /home/newuser/app
+RUN mkdir -p /home/newuser/.oresoftware/nodejs
 WORKDIR /home/newuser/app
 
 RUN sudo chown -R $(whoami) $(npm config get prefix)/lib
@@ -21,7 +23,10 @@ RUN sudo chown -R $(whoami) $(npm config get prefix)/share
 RUN sudo chown -R $(whoami) /usr/local/lib
 RUN sudo chown -R $(whoami) /usr/local/etc
 
-RUN npm install -g "r2g@latest";
+RUN npm install -g "r2g@0.0.112";
+
+RUN sudo chown -R $(whoami) "/home/newuser/.oresoftware"
+
 RUN npm install -g typescript
 
 COPY package.json .
