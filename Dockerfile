@@ -23,7 +23,7 @@ RUN sudo chown -R $(whoami) $(npm config get prefix)/share
 RUN sudo chown -R $(whoami) /usr/local/lib
 RUN sudo chown -R $(whoami) /usr/local/etc
 
-RUN npm install -g "r2g@0.0.112";
+RUN npm install -g "r2g@0.0.113";
 
 RUN sudo chown -R $(whoami) "/home/newuser/.oresoftware"
 
