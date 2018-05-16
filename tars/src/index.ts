@@ -150,7 +150,7 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
     }
     
     if (204 === res.statusCode || 304 === res.statusCode) {
-      
+  
       if (debug) {
         isSelfLog ? log.info('sending a 204/304 for path:', req.path) :
           statikCache.emit(eventName, 'sending a 204/304 for path:', req.path);
@@ -195,7 +195,3 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
 });
 
 export default statikCache;
-
-export const r2gSmokeTest = function () {
-  return true;
-};
