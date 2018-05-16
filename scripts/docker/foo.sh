@@ -13,6 +13,7 @@ docker network rm foo || echo "no network";
 docker stop npm_registry || echo "no container to stop."
 docker rm npm_registry || echo "no container to remove."
 docker build -t npm_registry .
+
 #docker run --net="foo" -it --name npm_registry npm_registry
 
 

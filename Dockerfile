@@ -21,7 +21,7 @@ RUN sudo chown -R $(whoami) $(npm config get prefix)/share
 RUN sudo chown -R $(whoami) /usr/local/lib
 RUN sudo chown -R $(whoami) /usr/local/etc
 
-RUN npm install -g r2g
+RUN npm install -g "r2g@latest";
 RUN npm install -g typescript
 
 COPY package.json .
