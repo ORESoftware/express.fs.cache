@@ -14,7 +14,7 @@ npm cache clean -f;
 
 #npm install --loglevel=warn
 
-sudo chown -R $(whoami) "node_modules"
+#sudo chown -R $(whoami) "node_modules"
 
 echo "now installing the deps...!!"
 npm install /host_user_home/WebstormProjects/oresoftware/gmx

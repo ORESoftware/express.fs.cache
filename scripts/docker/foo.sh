@@ -2,7 +2,7 @@
 
 set -e;
 
-docker network rm foo || echo "no network";
+#docker network rm foo || echo "no network";
 #docker network create "foo" || echo "network already exists??"
 
 #docker stop npm_registry_server || echo "no container to stop."
@@ -17,4 +17,4 @@ docker build -t npm_registry .
 #docker run --net="foo" -it --name npm_registry npm_registry
 
 
-docker run -v "$HOME":/host_user_home -it --name npm_registry npm_registry
+docker run -v "$HOME":/host_user_home:ro -it --name npm_registry npm_registry
