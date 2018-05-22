@@ -12,6 +12,7 @@ import parseUrl = require('parseurl');
 import EventEmitter = require('events');
 import {makeFunctionEmitter, FunctionEmitter} from "./utils";
 import fresh = require('fresh');
+import {WaldoSearch} from '@oresoftware/waldo';
 
 const log = {
   info: console.log.bind(console, chalk.gray.bold('@oresoftware/express.fs.cache:')),
@@ -64,26 +65,16 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
   
   const eventName = 'express.fs.cache';
   const cache = {} as StatikCache;
-  let stdout = '';
   
-  try {
-    stdout = String(cp.execSync(` . "$HOME/.gmx/gmx.sh"; gmx waldo -p ${basePath};\n`) || '').trim();
-  }
-  catch (err) {
-    log.error('cannot read contents in directory:', p);
-    throw getCleanTrace(err);
-  }
-  
-  const methods = <StatikCacheMethods>{
-    'HEAD': true,
-    'GET': true
-  };
-  
-  const q = async.queue(function (task: any, cb) {
-    task(cb);
-  }, 5);
-  
-  const extensions = ['.js', '.css', '.html'];
+  // let stdout = '';
+  //
+  // try {
+  //   stdout = String(cp.execSync(` . "$HOME/.gmx/gmx.sh"; gmx waldo -p ${basePath};\n`) || '').trim();
+  // }
+  // catch (err) {
+  //   log.error('cannot read contents in directory:', p);
+  //   throw getCleanTrace(err);
+  // }
   
   const matchesExtensions = function (s: string) {
     return extensions.some(function (ext) {
@@ -91,31 +82,53 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
     })
   };
   
-  String(stdout).split('\n').map(v => String(v || '').trim())
-    .forEach(function (v) {
-      if (v && matchesExtensions(v)) {
-        log.info('all those files:', v);
-        q.push(function (cb: any) {
+  new WaldoSearch({
+    path: basePath,
+    matchesAnyOf: ['\\.js$', '\\.html$', '\\.css$'],
+    matchesNoneOf: ['/\.git/', '/node_modules/', '/\.idea/']
+  })
+  .search(function (err, results) {
+    
+    if (err) {
+      throw err;
+    }
+    
+    async.eachLimit(results, 5, function (v, cb) {
+        if (v && matchesExtensions(v)) {
+          log.info('all those files:', v);
           fs.readFile(v, function (err, data) {
-            if (!err) (cache[v] = String(data || ''));
+            err ? log.error(err) : (cache[v] = String(data || ''));
             cb(null);
           });
-        });
-      }
-    });
-  
-  q.drain = function () {
-    const keys = Object.keys(cache);
-    log.info('this many files are in the cache:', keys.length);
-    if (debug) {
-      isSelfLog ? log.info('here are the files in the cache:') :
-        statikCache.emit(eventName, 'this many files are in the cache:', keys.length);
-      
-      keys.forEach(function (k) {
-        isSelfLog ? log.info(k) : statikCache.emit(eventName, k);
+        }
+      },
+      function (err) {
+        if (err) throw err;
+        log.info('done loading files into memory.');
       });
-    }
+  });
+  
+  const methods = <StatikCacheMethods>{
+    'HEAD': true,
+    'GET': true
   };
+  
+  // const q = async.queue(function (task: any, cb) {
+  //   task(cb);
+  // }, 5);
+  
+  const extensions = ['.js', '.css', '.html'];
+  
+  const keys = Object.keys(cache);
+  log.info('this many files are in the cache:', keys.length);
+  if (debug) {
+    isSelfLog ? log.info('here are the files in the cache:') :
+      statikCache.emit(eventName, 'this many files are in the cache:', keys.length);
+    
+    keys.forEach(function (k) {
+      isSelfLog ? log.info(k) : statikCache.emit(eventName, k);
+    });
+  }
   
   const isFresh = function (method: string, req: Request, res: Response) {
     
