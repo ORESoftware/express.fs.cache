@@ -134,6 +134,12 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
     
     const status = res.statusCode;
     
+    log.info('status code:', status);
+    
+    if (!status) {
+      res.statusCode = 200;
+    }
+    
     // GET or HEAD for weak freshness validation only
     if ('GET' !== method && 'HEAD' !== method) {
       return false;
@@ -144,7 +150,7 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
       return fresh(req.headers, {
         'etag': res.get('ETag'),
         'last-modified': res.get('Last-Modified')
-      })
+      });
     }
     
     return false;
@@ -159,6 +165,7 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
     }
     
     if (isFresh(method, req, res)) {
+      log.info('we got a fresh one!', req.path);
       res.statusCode = 304;
     }
     
@@ -192,13 +199,22 @@ export const statikCache = makeFunctionEmitter(<StatikCacheEmitter>function (p, 
           statikCache.emit(eventName, 'using cache for file:', absFilePath);
       }
       
-      return res.end('\n\n' + cache[absFilePath] + '\n');
+      // res.header('Cache-Control','private');
+      // res.setHeader("Cache-Control", "private, max-age=2592000");
+      // res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+      
+      res.removeHeader('Cache-Control');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      
+      res.end('\n' + cache[absFilePath] + '\n');
+      // res.send();
+      return;
     }
     
     if (debug) {
       isSelfLog ?
-        log.warn('not using cache for file:', absFilePath) :
-        statikCache.emit(eventName, 'not using cache for file:', absFilePath);
+        log.warn('*not* using cache for file:', absFilePath) :
+        statikCache.emit(eventName, '*not* using cache for file:', absFilePath);
     }
     
     next();
