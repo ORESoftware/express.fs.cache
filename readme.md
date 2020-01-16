@@ -1,26 +1,28 @@
 
 
-<a align="right" href="https://travis-ci.org/ORESoftware/live-mutex">
-    <img align="right" alt="Travis Build Status" src="https://travis-ci.org/ORESoftware/live-mutex.svg?branch=dev">
+<a align="right" href="https://travis-ci.org/ORESoftware/express.fs.cache">
+    <img align="right" alt="Travis Build Status" src="https://travis-ci.org/ORESoftware/express.fs.cache.svg?branch=master">
 </a>
 
 <br>
 
-<a align="right" href="https://circleci.com/gh/ORESoftware/live-mutex">
-    <img align="right" alt="CircleCI Build Status" src="https://circleci.com/gh/ORESoftware/live-mutex.png?branch=dev&circle-token=8ee83a1b06811c9a167e71d12b52f8cf7f786581">
+<a align="right" href="https://circleci.com/gh/ORESoftware/express.fs.cache">
+    <img align="right" alt="CircleCI Build Status" src="https://circleci.com/gh/ORESoftware/express.fs.cache.png?branch=master&circle-token=8ee83a1b06811c9a167e71d12b52f8cf7f786581">
 </a>
 
 <br>
 
-<a align="right" href="https://www.npmjs.com/package/live-mutex">
-<img align="right" alt="Latest NPM version" src="https://img.shields.io/npm/v/live-mutex.svg?colorB=green">
+<a align="right" href="https://www.npmjs.com/package/@oresoftware/fast.static">
+<img align="right" alt="Latest NPM version" src="https://img.shields.io/npm/v/@oresoftware/fast.static.svg?colorB=green">
 </a>
 
 <br>
 
 # @oresoftware/fast.static
 
-> Use Express middleware to cache and serve static assets
+> Use Express middleware to cache and serve static assets from memory, not disk.
+> A good optimization for production servers.
+> Will tell you how big the cache is, in bytes, in memory.
 
 ### Installation:
 
