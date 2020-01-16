@@ -16,10 +16,10 @@ src
 .gitignore
 .npmignore
 .travis.yml
-suman.conf.js
 
 ### matching
 *.log
+*.txt
 *.md
 *.json
 *.DS_Store

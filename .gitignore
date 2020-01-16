@@ -11,5 +11,4 @@ dist/*
 *.tgz
 
 ### inverse
-!dist/.gitkeep
-!dist/README.md
+!dist/readme.md

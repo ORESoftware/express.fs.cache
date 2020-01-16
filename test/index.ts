@@ -1,5 +1,5 @@
 import express = require('express');
-import {statikCache} from '../dist/main';
+// import {statikCache} from '../dist/main';
 import {ErrorRequestHandler} from "express";
 import path = require('path');
 
@@ -9,11 +9,15 @@ const app = express();
 //   console.log.call(console, 'static cache info:', ...arguments);
 // });
 
-const c = statikCache('fixtures', {debug: true});
+import statikCache from '@oresoftware/fast.static';
 
-c.emitter.on('ege', (r: any) => console.log(r));
+if(process.env.we_in_production === 'yes'){
+  app.use('/public', statikCache('public'));
+}
 
-app.use('/fixtures', c);
+app.use('/public', express.static('public'));
+
+
 
 app.use(function (req, res, next) {
   next(new Error('404'));
