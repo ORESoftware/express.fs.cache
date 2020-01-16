@@ -1,14 +1,34 @@
 
-### @oresoftware/fast.static
 
-### Use Express middleware to cache and serve static assets
+<a align="right" href="https://travis-ci.org/ORESoftware/live-mutex">
+    <img align="right" alt="Travis Build Status" src="https://travis-ci.org/ORESoftware/live-mutex.svg?branch=dev">
+</a>
 
-#### Installation:
+<br>
+
+<a align="right" href="https://circleci.com/gh/ORESoftware/live-mutex">
+    <img align="right" alt="CircleCI Build Status" src="https://circleci.com/gh/ORESoftware/live-mutex.png?branch=dev&circle-token=8ee83a1b06811c9a167e71d12b52f8cf7f786581">
+</a>
+
+<br>
+
+<a align="right" href="https://www.npmjs.com/package/live-mutex">
+<img align="right" alt="Latest NPM version" src="https://img.shields.io/npm/v/live-mutex.svg?colorB=green">
+</a>
+
+<br>
+
+# @oresoftware/fast.static
+
+> Use Express middleware to cache and serve static assets
+
+### Installation:
 
 >
 > `npm i @oresoftware/fast.static`
 >
 
+## Example
 
 ```js
 
