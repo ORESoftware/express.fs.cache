@@ -6,7 +6,7 @@
   "types": "dist/main.d.ts",
   "typings": "dist/main.d.ts",
   "scripts": {
-    "test": "suman test"
+    "test": "echo 'noop'"
   },
   "repository": {
     "type": "git",
