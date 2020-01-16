@@ -1,6 +1,6 @@
 {
   "name": "@oresoftware/fast.static",
-  "version": "0.0.110-alpha.0",
+  "version": "0.1.0",
   "description": "Semver-oriented TypeScript library skeleton.",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
