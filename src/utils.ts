@@ -1,13 +1,18 @@
 import EventEmitter = require('events');
-import statikCache, {StatikCacheOpts} from "./index";
+import statikCache, {StatikCacheOpts} from "./main";
 import {RequestHandler} from "express";
 
 export interface FunctionEmitter extends Function, EventEmitter {
 
 }
 
-export const makeFunctionEmitter = function (fn: Function): FunctionEmitter {
-  const p = Object.assign(Object.create(Function.prototype), EventEmitter.prototype);
+export interface FunctionEmitter1 extends RequestHandler {
+  emitter: EventEmitter
+}
+
+export const makeFunctionEmitter = (fn: Function): FunctionEmitter => {
+  const e = new EventEmitter();
+  const p = Object.assign(Object.create(Function.prototype), e);
   Object.setPrototypeOf(fn, p);
   EventEmitter.call(fn);
   return fn as FunctionEmitter;
