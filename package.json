@@ -1,6 +1,6 @@
 {
-  "name": "@oresoftware/express.fs.cache",
-  "version": "0.0.109",
+  "name": "@oresoftware/fast.static",
+  "version": "0.0.110-alpha.0",
   "description": "Semver-oriented TypeScript library skeleton.",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
