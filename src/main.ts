@@ -109,12 +109,12 @@ export const statikCache = <StatikCacheEmitter>function (p, opts) {
 
       if (s.isDirectory()) {
         loadFilesWithinDir(i);
-        return;
+        continue;
       }
 
       if (!s.isFile()) {
         log.warn('Filepath within stakik cache dir is not a file:', i);
-        return;
+        continue;
       }
 
       if (!matchesExtensions(i)) {
